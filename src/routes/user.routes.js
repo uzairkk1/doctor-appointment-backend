@@ -17,6 +17,8 @@ import permissionsRequired from "../middlewares/permissionsRequired.js";
 const router = express.Router();
 
 router.post("/auth/register", register);
+router.post("/auth/doctor/register", register);
+
 router.post(
   "/auth/admin/register",
   protect,

@@ -7,9 +7,11 @@ import isEmail from "validator/lib/isEmail.js";
 import crypto from "crypto";
 import Email from "../utils/email.js";
 import { promisify } from "util";
+import { ROLES_TYPES } from "../utils/constants.js";
 
 export const register = catchAsync(async (req, res, next) => {
   let isAdmin = req.url.includes("/admin/");
+  let isDoctor = req.url.includes("/doctor/");
 
   const newUser = new userModel({
     name: req.body.name,
@@ -19,14 +21,17 @@ export const register = catchAsync(async (req, res, next) => {
   });
 
   if (isAdmin) {
-    newUser.role = req.body.role ? req.body.role : "USER";
+    newUser.role = req.body.role ? req.body.role : ROLES_TYPES.USER;
+  } else if (isDoctor) {
+    newUser.role = ROLES_TYPES.DOCTOR;
   }
 
   await newUser.save();
 
   res.status(200).json({
     status: "success",
-    message: "Token sent to email!",
+    message:
+      "Account was created successfully please check you email for verification",
   });
 });
 
