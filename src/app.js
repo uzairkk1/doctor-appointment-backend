@@ -3,6 +3,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 import userRouter from "./routes/user.routes.js";
+import appointmentRouter from "./routes/appointment.routes.js";
 import errorController from "./controllers/error.controller.js";
 
 import AppError from "./utils/AppError.js";
@@ -16,6 +17,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/appointments", appointmentRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
