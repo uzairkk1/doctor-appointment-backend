@@ -1,5 +1,5 @@
 import catchAsync from "../utils/catchAsync.js";
-import userModel from "../models/user.model.js";
+// import userModel from "../models/user.model.js";
 import refreshTokenModel from "../models/refreshToken.model.js";
 import AppError from "../utils/AppError.js";
 import jwt from "jsonwebtoken";
@@ -8,22 +8,31 @@ import crypto from "crypto";
 import Email from "../utils/email.js";
 import { promisify } from "util";
 import { ROLES_TYPES } from "../utils/constants.js";
+import { baseUserModel } from "../models/baseUser.model.js";
+import Doctor from "../models/doctor.model.js";
 
 export const register = catchAsync(async (req, res, next) => {
   let isAdmin = req.url.includes("/admin/");
   let isDoctor = req.url.includes("/doctor/");
 
-  const newUser = new userModel({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    confirmPassword: req.body.confirmPassword,
-  });
+  let newUser = undefined;
 
-  if (isAdmin) {
-    newUser.role = req.body.role ? req.body.role : ROLES_TYPES.USER;
+  if (isAdmin || !isDoctor) {
+    newUser = new baseUserModel({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      confirmPassword: req.body.confirmPassword,
+    });
+    newUser.role = isAdmin && req.body.role ? req.body.role : ROLES_TYPES.USER;
   } else if (isDoctor) {
-    newUser.role = ROLES_TYPES.DOCTOR;
+    newUser = new Doctor({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      confirmPassword: req.body.confirmPassword,
+      role: ROLES_TYPES.DOCTOR,
+    });
   }
 
   await newUser.save();
@@ -41,7 +50,7 @@ export const login = catchAsync(async (req, res, next) => {
     return next(new AppError("All fields are required", 400));
   }
 
-  const user = await userModel.findOne({ email }).select("+password");
+  const user = await baseUserModel.findOne({ email }).select("+password");
   if (!user || !user.comparePassword(password, user.password))
     return next(new AppError("Invalid Credentials", 404));
   if (!user.isVerified)
@@ -97,7 +106,7 @@ export const refreshToken = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid token", 401));
   }
 
-  const user = await userModel.findById(decoded.id);
+  const user = await baseUserModel.findById(decoded.id);
   if (!user) {
     return next(
       new AppError(
@@ -142,7 +151,7 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
     .update(verificationToken)
     .digest("hex");
 
-  const user = await userModel.findOne({
+  const user = await baseUserModel.findOne({
     emailVerificationToken: verificationToken,
     emailVerificationTokenExpiration: { $gt: Date.now() },
   });
@@ -163,7 +172,7 @@ export const changeEmail = catchAsync(async (req, res, next) => {
   const { newEmail } = req.body;
 
   if (!isEmail(newEmail)) return next(new AppError("Invalid email", 401));
-  const isNewEmailExist = await userModel.findOne({ email: newEmail });
+  const isNewEmailExist = await baseUserModel.findOne({ email: newEmail });
 
   if (isNewEmailExist)
     return next(
@@ -173,7 +182,7 @@ export const changeEmail = catchAsync(async (req, res, next) => {
       )
     );
 
-  const user = await userModel.findById({ _id: req.user._id });
+  const user = await baseUserModel.findById({ _id: req.user._id });
 
   user.email = newEmail;
   user.isVerified = false;
@@ -191,7 +200,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
   if (!isEmail(email)) return next(new AppError("Invalid email", 401));
 
-  const user = await userModel.findOne({ email });
+  const user = await baseUserModel.findOne({ email });
   if (!user) return next(new AppError("User doest not exist", 404));
 
   if (!user.isVerified)
@@ -235,7 +244,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
     .update(verificationToken)
     .digest("hex");
 
-  const user = await userModel.findOne({
+  const user = await baseUserModel.findOne({
     passwordResetToken: verificationToken,
     passwordResetTokenExpiration: { $gt: Date.now() },
   });

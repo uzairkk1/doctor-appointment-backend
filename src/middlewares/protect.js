@@ -1,5 +1,5 @@
 import { promisify } from "util";
-import userModel from "../models/user.model.js";
+import { baseUserModel } from "../models/baseUser.model.js";
 import jwt from "jsonwebtoken";
 import { TYPES } from "./../utils/constants.js";
 import catchAsync from "./../utils/catchAsync.js";
@@ -28,7 +28,7 @@ export default catchAsync(async (req, res, next) => {
   );
 
   // 3) Check if user still exists
-  const currentUser = await userModel.findById(decoded.id);
+  const currentUser = await baseUserModel.findById(decoded.id);
   if (!currentUser) {
     return next(
       new AppError(
