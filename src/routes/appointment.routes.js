@@ -3,6 +3,8 @@ import {
   setAppointment,
   getAppointments,
   checkAvailability,
+  updateAppointment,
+  doctorUpdateAppointment,
 } from "./../controllers/appointment.controller.js";
 
 import { PERMISSION } from "../utils/constants.js";
@@ -13,6 +15,8 @@ import permissionsRequired from "../middlewares/permissionsRequired.js";
 const router = express.Router();
 
 router.route("/").get(getAppointments).post(setAppointment);
+router.patch("/update/:id", doctorUpdateAppointment);
+router.route("/:id").patch(updateAppointment);
 
 router.route("/availability").post(checkAvailability);
 
