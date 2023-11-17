@@ -264,3 +264,21 @@ export const resetPassword = catchAsync(async (req, res, next) => {
       "Your password has been changed. You can now login and use the app",
   });
 });
+
+export const updateDoctor = catchAsync(async (req, res, next) => {
+  const doctorId = req.params.id;
+  const data = req.body;
+
+  const updatedDoc = await Doctor.findOneAndUpdate(
+    {
+      _id: doctorId,
+    },
+    req.body,
+    { new: true }
+  );
+
+  res.status(200).json({
+    status: "ok",
+    data: updatedDoc,
+  });
+});

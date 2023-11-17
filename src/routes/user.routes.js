@@ -7,6 +7,7 @@ import {
   forgotPassword,
   resetPassword,
   refreshToken,
+  updateDoctor,
 } from "./../controllers/auth.controller.js";
 
 import { PERMISSION } from "../utils/constants.js";
@@ -32,6 +33,8 @@ router.patch("/auth/email", protect, changeEmail);
 router.post("/auth/forgotPassword", forgotPassword);
 router.post("/auth/resetPassword/:token", resetPassword);
 router.get("/auth/emailverification/:token", verifyEmail);
+
+router.post("/doctor/update/:id", updateDoctor);
 
 router.get(
   "/",
