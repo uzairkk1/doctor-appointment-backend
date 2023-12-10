@@ -274,18 +274,36 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
 export const updateDoctor = catchAsync(async (req, res, next) => {
   const doctorId = req.params.id;
-  const data = req.body;
+  const requesterId = req.user.id;
+  if (doctorId != requesterId && req.user.role != ROLES_TYPES.ADMIN) {
+    return res.status(403).json({
+      status: "ok",
+      message: "You don't have permission to perform this action",
+    });
+  }
 
-  const updatedDoc = await Doctor.findOneAndUpdate(
-    {
-      _id: doctorId,
-    },
-    req.body,
-    { new: true }
-  );
+  const data = req.body;
+  let doc = await Doctor.findOne({
+    _id: doctorId,
+  });
+
+  if (!doc) {
+    return res.status(404).json({
+      status: "ok",
+      message: "Requested doctor not found",
+    });
+  }
+
+  doc.address = data.address;
+  doc.specialization = data.specialization;
+  doc.experience = data.experience;
+  doc.feePerCunsultation = data.feePerCunsultation;
+  doc.timings = data.timings;
+
+  await doc.save();
 
   res.status(200).json({
     status: "ok",
-    data: updatedDoc,
+    data: "Your profile has been completed successfully",
   });
 });

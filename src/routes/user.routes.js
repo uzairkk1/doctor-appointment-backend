@@ -36,7 +36,7 @@ router.post("/auth/forgotPassword", forgotPassword);
 router.post("/auth/resetPassword/:token", resetPassword);
 router.get("/auth/emailverification/:token", verifyEmail);
 
-router.post("/doctor/update/:id", updateDoctor);
+router.post("/doctor/update/:id", protect, updateDoctor);
 
 router.get(
   "/",

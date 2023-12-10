@@ -6,8 +6,6 @@ const slotsSchema = new Schema(
     dayIndex: {
       type: Number,
       required: true,
-      enum: [0, 1, 2, 3, 4, 5, 6],
-      unique: true,
     },
     timingSlots: {
       type: [
@@ -32,8 +30,9 @@ const DoctorSchema = new Schema({
     trim: true,
   },
   experience: {
-    type: String,
+    type: Number,
     trim: true,
+    default: 0,
   },
   feePerCunsultation: {
     type: Number,
@@ -43,7 +42,6 @@ const DoctorSchema = new Schema({
   timings: {
     type: [slotsSchema],
     required: true,
-    default: [],
   },
   backTimings: {
     type: [
