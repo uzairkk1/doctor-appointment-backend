@@ -49,9 +49,11 @@ export const setAppointment = catchAsync(async (req, res, next) => {
 
 export const getAppointments = catchAsync(async (req, res, next) => {
   //simulate loggedin user for now
-  const userId = "6553d303c9ad6c4be3738d16";
+  const userId = req.user._id;
 
-  const appointments = await Appointment.find({ userId }).populate("doctorId");
+  const appointments = await Appointment.find({ userId })
+    .populate("doctorId")
+    .populate("userId");
 
   res.status(200).json({
     status: "success",
