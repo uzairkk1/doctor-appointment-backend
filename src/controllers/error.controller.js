@@ -34,6 +34,9 @@ const handleDuplicateFieldDB = function (err) {
   );
 };
 
+const handleJWTExpiredError = () =>
+  new AppError("Your token has expired! Please log in again.", 401);
+
 export default (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
@@ -47,6 +50,7 @@ export default (err, req, res, next) => {
     error.message = err.message;
 
     if (error.code === 11000) error = handleDuplicateFieldDB(error);
+    if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
 
     sendErrorProd(error, req, res);
   }

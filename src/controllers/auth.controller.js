@@ -51,7 +51,7 @@ export const login = catchAsync(async (req, res, next) => {
   }
 
   const user = await baseUserModel.findOne({ email }).select("+password");
-  if (!user || !user.comparePassword(password, user.password))
+  if (!user || !(await user.comparePassword(password, user.password)))
     return next(new AppError("Invalid Credentials", 404));
   if (!user.isVerified)
     return next(
@@ -60,7 +60,7 @@ export const login = catchAsync(async (req, res, next) => {
 
   //generate tokens
   const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_KEY, {
-    expiresIn: 60,
+    expiresIn: 20,
     issuer: "my-site.com",
   });
   const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_KEY, {
@@ -81,6 +81,13 @@ export const login = catchAsync(async (req, res, next) => {
     status: "success",
     accessToken,
     user,
+  });
+});
+
+export const getCurrentUser = catchAsync(async (req, res, next) => {
+  res.status(200).json({
+    status: "success",
+    user: req.user,
   });
 });
 
@@ -118,7 +125,7 @@ export const refreshToken = catchAsync(async (req, res, next) => {
 
   //generate tokens
   const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_KEY, {
-    expiresIn: 3000,
+    expiresIn: 20,
     issuer: "my-site.com",
   });
   const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_KEY, {
@@ -144,7 +151,7 @@ export const refreshToken = catchAsync(async (req, res, next) => {
 export const verifyEmail = catchAsync(async (req, res, next) => {
   let verificationToken = req.params.token;
   if (!verificationToken)
-    return next(new AppError("User doest not exist", 404));
+    return next(new AppError("Invalid token provided", 404));
 
   verificationToken = crypto
     .createHash("sha256")
@@ -155,7 +162,7 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
     emailVerificationToken: verificationToken,
     emailVerificationTokenExpiration: { $gt: Date.now() },
   });
-  if (!user) return next(new AppError("User doest not exist", 404));
+  if (!user) return next(new AppError("Invalid token provided", 404));
 
   user.emailVerificationToken = undefined;
   user.emailVerificationTokenExpiration = undefined;
@@ -215,7 +222,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   try {
-    let url = `${process.env.BASE_URL}/api/v1/users/auth/resetPassword/${resetToken}`;
+    let url = `${process.env.FRONT_END_BASE_URL}/verify/${resetToken}`;
     const email = new Email(user, url);
     await email.passwordReset();
     res.status(200).json({

@@ -101,7 +101,7 @@ userBaseSchema.post("save", async function (doc) {
   if (doc && (doc.isEmailModified || doc.wasNew)) {
     const email = new Email(
       doc,
-      `${process.env.BASE_URL}/api/v1/users/auth/emailverification/${doc.emailToken}`
+      `${process.env.FRONT_END_BASE_URL}/verify/${doc.emailToken}`
     );
     await email.sendWelcome();
   }

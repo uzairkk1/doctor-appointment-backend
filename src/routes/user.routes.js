@@ -8,6 +8,7 @@ import {
   resetPassword,
   refreshToken,
   updateDoctor,
+  getCurrentUser,
 } from "./../controllers/auth.controller.js";
 
 import { PERMISSION } from "../utils/constants.js";
@@ -30,6 +31,7 @@ router.get("/auth/refresh", refreshToken);
 
 router.post("/auth/login", login);
 router.patch("/auth/email", protect, changeEmail);
+router.get("/auth/getCurrentUser", protect, getCurrentUser);
 router.post("/auth/forgotPassword", forgotPassword);
 router.post("/auth/resetPassword/:token", resetPassword);
 router.get("/auth/emailverification/:token", verifyEmail);
