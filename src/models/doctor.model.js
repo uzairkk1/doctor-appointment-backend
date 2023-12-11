@@ -43,25 +43,25 @@ const DoctorSchema = new Schema({
     type: [slotsSchema],
     required: true,
   },
-  backTimings: {
-    type: [
-      {
-        dayIndex: {
-          type: Number,
-          required: true,
-        },
-        timingSlots: {
-          type: [String],
-          required: true,
-        },
-        validTill: {
-          type: Date,
-          required: true,
-        },
-      },
-    ],
-    default: [],
-  },
+  // backTimings: {
+  //   type: [
+  //     {
+  //       dayIndex: {
+  //         type: Number,
+  //         required: true,
+  //       },
+  //       timingSlots: {
+  //         type: [String],
+  //         required: true,
+  //       },
+  //       validTill: {
+  //         type: Date,
+  //         required: true,
+  //       },
+  //     },
+  //   ],
+  //   default: [],
+  // },
   isProfileCompleted: {
     type: Boolean,
     default: false,

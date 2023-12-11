@@ -2,6 +2,7 @@ import Appointment from "../models/appointment.model.js";
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
 import dayjs from "dayjs";
+import { ROLES_TYPES } from "../utils/constants.js";
 
 export const checkAvailability = catchAsync(async (req, res, next) => {
   const date = dayjs(`${req.body.date} ${req.body.time}`);
@@ -48,10 +49,13 @@ export const setAppointment = catchAsync(async (req, res, next) => {
 });
 
 export const getAppointments = catchAsync(async (req, res, next) => {
-  //simulate loggedin user for now
   const userId = req.user._id;
+  let filter = { userId };
+  if (req.user.role === ROLES_TYPES.DOCTOR) {
+    filter = { doctorId: userId };
+  }
 
-  const appointments = await Appointment.find({ userId })
+  const appointments = await Appointment.find(filter)
     .populate("doctorId")
     .populate("userId");
 
