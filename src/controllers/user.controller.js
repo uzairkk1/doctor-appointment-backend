@@ -50,6 +50,24 @@ export const updateDoctor = catchAsync(async (req, res, next) => {
 export const getDoctors = catchAsync(async (req, res, next) => {
   let doc = await Doctor.find({ isProfileCompleted: true });
 
+  res.status(200).json({
+    status: "ok",
+    data: doc,
+  });
+});
+export const getDoctor = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  let doc = await Doctor.findById(id).lean();
+
+  const disabledDays = [1, 2, 3, 4, 5, 6, 7].filter((day) => {
+    let isDocNotAvailable = false;
+    doc.timings.forEach((time) => (isDocNotAvailable = time.dayIndex != day));
+
+    return isDocNotAvailable;
+  });
+
+  doc.disabledDays = disabledDays;
+
   debugger;
   res.status(200).json({
     status: "ok",

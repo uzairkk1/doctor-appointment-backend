@@ -9,7 +9,11 @@ import {
   refreshToken,
   getCurrentUser,
 } from "./../controllers/auth.controller.js";
-import { updateDoctor, getDoctors } from "./../controllers/user.controller.js";
+import {
+  updateDoctor,
+  getDoctors,
+  getDoctor,
+} from "./../controllers/user.controller.js";
 
 import { PERMISSION } from "../utils/constants.js";
 
@@ -36,7 +40,10 @@ router.post("/auth/forgotPassword", forgotPassword);
 router.post("/auth/resetPassword/:token", resetPassword);
 router.get("/auth/emailverification/:token", verifyEmail);
 
-router.post("/doctor/update/:id", protect, updateDoctor);
+router
+  .route("/doctors/:id")
+  .get(protect, getDoctor)
+  .post(protect, updateDoctor);
 
 router.get("/doctors", protect, getDoctors);
 

@@ -5,6 +5,8 @@ export const ROLES_TYPES = {
   ADMIN: "ADMIN",
 };
 
+// export const DAYS_INDEX = [1,2,3,4,5,6,7]
+
 export const TYPES = {
   EMAIL: "EMAIL",
   PASSWORD: "PASSWORD",
