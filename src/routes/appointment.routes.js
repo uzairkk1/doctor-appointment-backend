@@ -14,8 +14,8 @@ import permissionsRequired from "../middlewares/permissionsRequired.js";
 
 const router = express.Router();
 
-router.route("/").get(protect, getAppointments).post(protect, setAppointment);
-router.patch("/update/:id", doctorUpdateAppointment);
+router.route("/").get(protect, getAppointments).post(setAppointment);
+router.patch("/update/:id", protect, doctorUpdateAppointment);
 router.route("/:id").patch(updateAppointment);
 
 router.route("/availability").post(checkAvailability);

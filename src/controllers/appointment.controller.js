@@ -28,18 +28,17 @@ export const checkAvailability = catchAsync(async (req, res, next) => {
 });
 
 export const setAppointment = catchAsync(async (req, res, next) => {
-  let { userId, doctorId, date, time } = req.body;
+  let { userId, doctorId, date, timeSlot } = req.body;
 
-  if (!userId || !doctorId || !date || !time) {
+  if (!userId || !doctorId || !date || !timeSlot) {
     return next(new AppError("All fields are required", 400));
   }
-
-  let dateTime = dayjs(`${date} ${time}`);
 
   const apt = await Appointment.create({
     userId,
     doctorId,
-    dateTime,
+    date,
+    timeSlot,
   });
 
   res.status(200).json({
@@ -50,14 +49,20 @@ export const setAppointment = catchAsync(async (req, res, next) => {
 
 export const getAppointments = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
+  const { docId, date } = req.query;
   let filter = { userId };
   if (req.user.role === ROLES_TYPES.DOCTOR) {
     filter = { doctorId: userId };
   }
 
+  if (docId && date) {
+    filter = { doctorId: docId, date, status: { $ne: "REJECTED" } };
+  }
+
   const appointments = await Appointment.find(filter)
     .populate("doctorId")
-    .populate("userId");
+    .populate("userId")
+    .lean();
 
   res.status(200).json({
     status: "success",
@@ -68,7 +73,7 @@ export const getAppointments = catchAsync(async (req, res, next) => {
 export const doctorUpdateAppointment = catchAsync(async (req, res, next) => {
   //simulate loggedin user for now
   const aptId = req.params.id;
-  const doctorId = req?.user?._id || "6553d73b6a79e14991998b9c";
+  const doctorId = req?.user?._id;
   const { status } = req.body;
   if (!aptId) return next(new AppError("Invalid appointment id", 400));
 
@@ -83,7 +88,6 @@ export const doctorUpdateAppointment = catchAsync(async (req, res, next) => {
     { new: true }
   );
 
-  debugger;
   res.status(200).json({
     status: "success",
     data: appointment,
@@ -110,8 +114,6 @@ export const updateAppointment = catchAsync(async (req, res, next) => {
     { dateTime },
     { new: true }
   );
-
-  debugger;
 
   res.status(200).json({
     status: "success",

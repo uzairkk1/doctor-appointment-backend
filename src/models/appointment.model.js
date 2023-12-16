@@ -12,8 +12,21 @@ const appointmentSchema = new Schema(
       ref: "Doctor",
       required: true,
     },
-    dateTime: {
+    date: {
       type: Date,
+      required: true,
+    },
+    timeSlot: {
+      type: {
+        startTime: {
+          type: String,
+          required: true,
+        },
+        endTime: {
+          type: String,
+          required: true,
+        },
+      },
       required: true,
     },
     status: {
