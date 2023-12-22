@@ -8,6 +8,7 @@ import {
   resetPassword,
   refreshToken,
   getCurrentUser,
+  logout,
 } from "./../controllers/auth.controller.js";
 import {
   updateDoctor,
@@ -34,6 +35,7 @@ router.post(
 router.get("/auth/refresh", refreshToken);
 
 router.post("/auth/login", login);
+router.post("/auth/logout", protect, logout);
 router.patch("/auth/email", protect, changeEmail);
 router.get("/auth/getCurrentUser", protect, getCurrentUser);
 router.post("/auth/forgotPassword", forgotPassword);

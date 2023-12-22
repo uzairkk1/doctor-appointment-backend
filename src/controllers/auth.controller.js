@@ -74,6 +74,7 @@ export const login = catchAsync(async (req, res, next) => {
   //send refresh token in cookies
   res.cookie("refreshToken", refreshToken, {
     maxAge: 1000 * 60 * 60 * 24 * 30,
+    path: "/",
     httpOnly: true,
   });
 
@@ -88,6 +89,18 @@ export const getCurrentUser = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     user: req.user,
+  });
+});
+
+export const logout = catchAsync(async (req, res, next) => {
+  res.clearCookie("refreshToken", {
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+    path: "/",
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    status: "success",
   });
 });
 
